@@ -16,7 +16,7 @@ const AkunList = () => {
     const { dataAkun, handleEditFormContex, handleDeleteContext } = useJB();
 
     const [currentId, setCurrentId] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchAkun, setSearchAkun] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(20);
     const [showEditForm, setShowEditForm] = useState(false);
@@ -29,42 +29,41 @@ const AkunList = () => {
     const [loginVia, setLoginVia] = useState('');
     const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false);
     const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false);
-    const [filteredNasabah, setFilteredNasabah] = useState([]);
+    const [viaIsLoginDropdownOpenTerus, setViaIsLoginDropdownOpenTerus] = useState(false);
+
+    const [filteredAkun, setFilteredAkun] = useState([]);
     const [showPassword, setShowPassword] = useState(false);
     const handleTogglePassword = (e) => {
         e.stopPropagation();
         setShowPassword(!showPassword);
     };
 
+    console.log(filteredAkun)
 
     useEffect(() => {
-        if (dataAkun && Array.isArray(dataAkun)) {
-            setFilteredNasabah(dataAkun);
-        }
+        setFilteredAkun(dataAkun);
     }, [dataAkun]);
 
     useEffect(() => {
-        if (dataAkun && Array.isArray(dataAkun)) {
-            const filteredData = dataAkun.filter(n => {
-                return (
-                    n.nickname.toLowerCase().includes(searchQuery) ||
-                    n.email.toLowerCase().includes(searchQuery) ||
-                    n.password.toLowerCase().includes(searchQuery) ||
-                    n.harga.toString().includes(searchQuery) ||
-                    n.jenisGame.toLowerCase().includes(searchQuery) ||
-                    (Array.isArray(n.loginVia)
-                        ? n.loginVia.some(via => via.toLowerCase().includes(searchQuery))
-                        : n.loginVia.toLowerCase().includes(searchQuery))
-                );
-            });
-            setFilteredNasabah(filteredData);
-        }
-    }, [searchQuery, dataAkun]);
+        const filteredData = dataAkun.filter(n => {
+            return (
+                n.nickname.toLowerCase().includes(searchAkun) ||
+                n.email.toLowerCase().includes(searchAkun) ||
+                n.password.toLowerCase().includes(searchAkun) ||
+                n.harga.toString().includes(searchAkun) ||
+                n.jenisGame.toLowerCase().includes(searchAkun) ||
+                ((n.loginVia)
+                    ? n.loginVia.some(via => via.toLowerCase().includes(searchAkun))
+                    :
+                    n.loginVia.toLowerCase().includes(searchAkun))
+            );
+        });
+        setFilteredAkun(filteredData);
+    }, [searchAkun, dataAkun]);
 
     const handleSearch = (event) => {
-        const searchTerm = event.target.value.toLowerCase();
-        console.log("Search Term:", searchTerm);
-        setSearchQuery(searchTerm);
+        const searchDataAkun = event.target.value.toLowerCase();
+        setSearchAkun(searchDataAkun);
     };
 
     const handleLoginChange = (login) => {
@@ -73,7 +72,7 @@ const AkunList = () => {
         } else {
             setLoginVia([...loginVia, login]);
         }
-        setViaIsLoginDropdownOpen(false);
+        setViaIsLoginDropdownOpenTerus(false);
     };
 
     const handleClick = (id) => {
@@ -122,19 +121,19 @@ const AkunList = () => {
         const sortOption = event.target.value;
         let sortedData;
         if (sortOption === 'highest') {
-            sortedData = [...filteredNasabah].sort((a, b) => b.harga - a.harga);
+            sortedData = [...filteredAkun].sort((a, b) => b.harga - a.harga);
         } else if (sortOption === 'lowest') {
-            sortedData = [...filteredNasabah].sort((a, b) => a.harga - b.harga);
+            sortedData = [...filteredAkun].sort((a, b) => a.harga - b.harga);
         }
-        setFilteredNasabah(sortedData);
+        setFilteredAkun(sortedData);
     };
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredNasabah.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredAkun.slice(indexOfFirstItem, indexOfLastItem);
 
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(filteredNasabah.length / itemsPerPage); i++) {
+    for (let i = 1; i <= Math.ceil(filteredAkun.length / itemsPerPage); i++) {
         pageNumbers.push(i);
     }
 
@@ -252,14 +251,14 @@ const AkunList = () => {
                                                     loginVia.join(', ')
                                                     :
                                                     "Login"}
-                                                <span className="ml-2">{viaLoginDropdownOpen ?
+                                                <span className="ml-2">{viaIsLoginDropdownOpenTerus ?
                                                     '▲' :
                                                     '▼'}</span>
                                             </div>
                                             {viaLoginDropdownOpen && (
                                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10 ">
                                                     {loginOptions.map((option, index) => (
-                                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ?
+                                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 ${loginVia.includes(option) ?
                                                             'bg-[#2D92CF] text-white'
                                                             :
                                                             ''}`} onClick={() => handleLoginChange(option)} >
@@ -284,7 +283,7 @@ const AkunList = () => {
 
                         <input
                             type="search"
-                            value={searchQuery}
+                            value={searchAkun}
                             onChange={handleSearch}
                             placeholder="Search"
                             className='w-full p-2 rounded border border-gray-300'
@@ -295,7 +294,7 @@ const AkunList = () => {
                             defaultValue=""
                             className='w-full md:w-auto p-2 rounded border border-gray-300'
                         >
-                            <option value="" disabled>Sort by Price</option>
+                            <option value="" disabled>Sort by Harga</option>
                             <option value="highest">Harga tertinggi</option>
                             <option value="lowest">Harga Terendah</option>
                         </select>
@@ -336,7 +335,10 @@ const AkunList = () => {
                                             <span>{akun.jenisGame}</span>
                                         </div>
                                     </td>
-                                    <td className='py-2 px-4 mx-[30px]'>{Array.isArray(akun.loginVia) ? akun.loginVia.join(', ') : akun.loginVia}</td>
+                                    <td className='py-2 px-4 mx-[30px]'>{(akun.loginVia) ?
+                                        akun.loginVia.join(', ')
+                                        :
+                                        akun.loginVia}</td>
                                     <td className='py-2 flex gap-2 items-center justify-center'>
                                         <button onClick={() => handleEdit(akun.id)} className='bg-[#2D92CF] text-white px-2 py-1 rounded mx-1'><FontAwesomeIcon icon={faPenToSquare} /></button>
                                         <button onClick={() => handleDelete(akun.id)} className='bg-[#2D92CF] text-white px-2 py-1 rounded mx-1'><FontAwesomeIcon icon={faTrashCan} /></button>
