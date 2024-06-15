@@ -46,9 +46,9 @@ const JBProvider = ({ children }) => {
                         nickname: updatedAkun.nickname,
                         email: updatedAkun.email,
                         password: updatedAkun.password,
-                        harga: Number(updatedAkun.harga), 
+                        harga: Number(updatedAkun.harga),
                         jenisGame: updatedAkun.jenisGame,
-                        loginVia: updatedAkun.loginVia 
+                        loginVia: updatedAkun.loginVia
                     };
                 }
                 return akun;

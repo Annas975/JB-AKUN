@@ -141,7 +141,10 @@ const AkunList = () => {
     const renderPageNumbers = pageNumbers.map(number => (
         <li
             key={number}
-            className={`px-3 py-1 ${currentPage === number ? 'bg-gray-300' : 'bg-white'} border border-gray-300 cursor-pointer`}
+            className={`px-3 py-1 ${currentPage === number ?
+                'bg-gray-300'
+                :
+                'bg-white'} border border-gray-300 cursor-pointer`}
             onClick={() => setCurrentPage(number)}
         >
             {number}
@@ -247,7 +250,8 @@ const AkunList = () => {
                                             <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
                                                 {loginVia.length > 0 ?
                                                     loginVia.join(', ')
-                                                    : "Login"}
+                                                    :
+                                                    "Login"}
                                                 <span className="ml-2">{viaLoginDropdownOpen ?
                                                     '▲' :
                                                     '▼'}</span>
@@ -255,7 +259,10 @@ const AkunList = () => {
                                             {viaLoginDropdownOpen && (
                                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10 ">
                                                     {loginOptions.map((option, index) => (
-                                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ? 'bg-[#2D92CF] text-white' : ''}`} onClick={() => handleLoginChange(option)} >
+                                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ?
+                                                            'bg-[#2D92CF] text-white'
+                                                            :
+                                                            ''}`} onClick={() => handleLoginChange(option)} >
                                                             {option}
                                                         </div>
                                                     ))}

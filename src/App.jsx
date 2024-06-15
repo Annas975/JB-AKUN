@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainLayout from './Page/mainLayout'; 
+import MainLayout from './Page/mainLayout';
 import { JBProvider } from './Page/context';
 
 const AppRoutes = () => {

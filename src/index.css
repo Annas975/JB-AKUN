@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 * {
-    box-sizing: border-box;
-    font-size:400;
-    font-family: "Inter", Helvetica, sans-serif;
-    padding: 0;
-    margin: 0;
-    /* overflow-x: hidden; */
+  box-sizing: border-box;
+  font-size: 400;
+  font-family: "Inter", Helvetica, sans-serif;
+  padding: 0;
+  margin: 0;
+  /* overflow-x: hidden; */
 }
 
-body{
+body {
   background-color: #F0F2F3;
   overflow-x: hidden;
-    /* padding-left: 100px;
+  /* padding-left: 100px;
     padding-right: 100px; */
 }
 
 h1 {
   font-size: 1.5rem;
   color: #2D92CF;
-  font-weight:600;
+  font-weight: 600;
 }
 
 .custom-text-shadow {
@@ -58,4 +58,3 @@ h3 {
   background-size: cover;
   background-position: top;
 }
-

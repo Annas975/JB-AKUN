@@ -13,7 +13,7 @@ const AddAkun = () => {
     const [nickname, setNickname] = useState('');
     const [loginVia, setLoginVia] = useState('');
     const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false);
-    const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+    const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const handleTogglePassword = () => {
         setShowPassword(!showPassword);
@@ -39,7 +39,7 @@ const AddAkun = () => {
         } else {
             setLoginVia([...loginVia, login]);
         }
-        loginDropdownOpen(false);
+        viaLoginDropdownOpen(false);
     };
 
     const handleSubmit = async (event) => {
@@ -94,7 +94,10 @@ const AddAkun = () => {
                             <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Password</label>
                             <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]"
                                 placeholder="Password"
-                                type={showPassword ? "text" : "password"}
+                                type={showPassword ?
+                                    "text"
+                                    :
+                                    "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)} />
                             <button
@@ -107,14 +110,23 @@ const AddAkun = () => {
                         </div>
                         <div className="relative flex flex-col">
                             <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Via Login</label>
-                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}>
-                                {loginVia.length > 0 ? loginVia.join(', ') : "Login"}
-                                <span className="ml-2">{loginDropdownOpen ? '▲' : '▼'}</span>
+                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
+                                {loginVia.length > 0 ?
+                                    loginVia.join(', ')
+                                    :
+                                    "Login"}
+                                <span className="ml-2">{viaLoginDropdownOpen ?
+                                    '▲'
+                                    :
+                                    '▼'}</span>
                             </div>
-                            {loginDropdownOpen && (
+                            {viaLoginDropdownOpen && (
                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
                                     {loginOptions.map((option, index) => (
-                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ? 'bg-[#2D92CF] text-white' : ''}`} onClick={() => handleLoginChange(option)} >
+                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ?
+                                            'bg-[#2D92CF] text-white'
+                                            :
+                                            ''}`} onClick={() => handleLoginChange(option)} >
                                             {option}
                                         </div>
                                     ))}
@@ -145,7 +157,10 @@ const AddAkun = () => {
                                     ) : (
                                         "Game"
                                     )}
-                                    <span className="ml-2">{dropdownJenisGameOpen ? '▲' : '▼'}</span>
+                                    <span className="ml-2">{dropdownJenisGameOpen ?
+                                        '▲'
+                                        :
+                                        '▼'}</span>
                                 </div>
                                 {dropdownJenisGameOpen && (
                                     <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
