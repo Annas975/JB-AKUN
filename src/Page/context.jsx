@@ -4,7 +4,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { FetchData } from './data';
 
-// Initial state for member data
 const initialJBState = {
     dataAkun: [],
     handleAddAkun: () => { },
@@ -13,13 +12,10 @@ const initialJBState = {
     handleDeleteContext: () => { },
 };
 
-// Create context for cooperative members data
 const JBContext = createContext(initialJBState);
 
-// Custom hook to use cooperative members data context
 const useJB = () => useContext(JBContext);
 
-// Provider component to provide cooperative members data
 const JBProvider = ({ children }) => {
     const [dataAkun, setDataAkun] = useState([]);
 
@@ -36,28 +32,26 @@ const JBProvider = ({ children }) => {
         }
     };
 
-
     const handleAddAkun = (newAkun) => {
         setDataAkun(prevDataAkun => [...prevDataAkun, newAkun]);
         localStorage.setItem('dataAkun', JSON.stringify([...dataAkun, newAkun]));
     };
 
-    const handleEditFormContex = (updatedMember) => {
-        console.log("Updated Member:", updatedMember); // Debugging log
+    const handleEditFormContex = (updatedAkun) => {
         setDataAkun(prevDataAkun => {
-            const updatedData = prevDataAkun.map(member => {
-                if (member.id === updatedMember.id) {
+            const updatedData = prevDataAkun.map(akun => {
+                if (akun.id === updatedAkun.id) {
                     return {
-                        ...member,
-                        nickname: updatedMember.nickname,
-                        email: updatedMember.email,
-                        password: updatedMember.password,
-                        harga: Number(updatedMember.harga), // Pastikan harga adalah angka
-                        jenisGame: updatedMember.jenisGame,
-                        loginVia: updatedMember.loginVia // Pastikan loginVia juga diupdate
+                        ...akun,
+                        nickname: updatedAkun.nickname,
+                        email: updatedAkun.email,
+                        password: updatedAkun.password,
+                        harga: Number(updatedAkun.harga), 
+                        jenisGame: updatedAkun.jenisGame,
+                        loginVia: updatedAkun.loginVia 
                     };
                 }
-                return member;
+                return akun;
             });
             localStorage.setItem('dataAkun', JSON.stringify(updatedData));
             return updatedData;
@@ -66,13 +60,11 @@ const JBProvider = ({ children }) => {
 
     const handleDeleteContext = (id) => {
         setDataAkun(prevDataAkun => {
-            const updatedData = prevDataAkun.filter(member => member.id !== id);
+            const updatedData = prevDataAkun.filter(akun => akun.id !== id);
             localStorage.setItem('dataAkun', JSON.stringify(updatedData));
             return updatedData;
         });
     };
-
-    
 
     useEffect(() => {
         fetchDataAkun();

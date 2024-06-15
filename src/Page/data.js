@@ -1,7 +1,4 @@
-//Data
-const data = [
-
-];
+const data = [];
 
 export const FetchData = async () => {
     return {
