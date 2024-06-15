@@ -11,18 +11,15 @@ const AddAkun = () => {
     const [harga, setHarga] = useState('');
     const [jenisGame, setJenisGame] = useState('');
     const [nickname, setNickname] = useState('');
-    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [loginVia, setLoginVia] = useState('');
+    const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false);
     const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState();
-
     const [showPassword, setShowPassword] = useState(false);
-    const handleTogglePassword = (e) => {
-        e.stopPropagation(); 
+    const handleTogglePassword = () => {
         setShowPassword(!showPassword);
     };
 
-    const predefinedGames = [
+    const dataGambarGame = [
         { name: "Genshin Impact", image: "./src/assets/genshin.png" },
         { name: "Mobile Legends", image: "./src/assets/mobileLegends.png" },
         { name: "PUBG Mobile", image: "./src/assets/PubgMobile.png" },
@@ -33,7 +30,7 @@ const AddAkun = () => {
 
     const handleGameChange = (game) => {
         setJenisGame(game);
-        setDropdownOpen(false);
+        setDropdownJenisGameOpen(false);
     };
 
     const handleLoginChange = (login) => {
@@ -42,7 +39,7 @@ const AddAkun = () => {
         } else {
             setLoginVia([...loginVia, login]);
         }
-        setIsDropdownOpen(false);
+        loginDropdownOpen(false);
     };
 
     const handleSubmit = async (event) => {
@@ -63,7 +60,7 @@ const AddAkun = () => {
             harga: parseFloat(harga),
             jenisGame,
             loginVia,
-            id: Math.random().toString(36).substring(2, 9), 
+            id: Math.random().toString(36).substring(2, 9),
         };
 
         try {
@@ -90,13 +87,13 @@ const AddAkun = () => {
                 <div className="flex gap-4">
                     <div className="flex flex-col gap-4 w-[50%]">
                         <div className="flex flex-col">
-                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Email</label>
+                            <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Email</label>
                             <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="flex flex-col relative">
-                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Password</label>
-                            <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" 
-                                placeholder="Password" 
+                            <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Password</label>
+                            <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]"
+                                placeholder="Password"
                                 type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)} />
@@ -109,10 +106,10 @@ const AddAkun = () => {
                             </button>
                         </div>
                         <div className="relative flex flex-col">
-                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Via Login</label>
+                            <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Via Login</label>
                             <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}>
                                 {loginVia.length > 0 ? loginVia.join(', ') : "Login"}
-                                <span className="ml-2">{isDropdownOpen ? '▲' : '▼'}</span>
+                                <span className="ml-2">{loginDropdownOpen ? '▲' : '▼'}</span>
                             </div>
                             {loginDropdownOpen && (
                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
@@ -125,44 +122,44 @@ const AddAkun = () => {
                             )}
                         </div>
                     </div>
-                    
+
                     <div className="flex flex-col w-[50%]">
-                    <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Nickname</label>
-                    <div className="flex flex-col gap-4 w-[100%]">
-                   
-                        <div>
-                            <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Nickname" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
-                        </div>
-                        <div className="flex flex-col">
-                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Harga</label>
-                            <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Harga" type="number" value={harga} onChange={(e) => setHarga(e.target.value)} />
-                        </div>
-                        <div className="relative flex flex-col">
-                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Jenis Game</label>
-                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                                {jenisGame ? (
-                                    <>
-                                        <img className="h-[24px] w-auto rounded-sm mr-2" src={predefinedGames.find(game => game.name === jenisGame)?.image} alt={jenisGame} />
-                                        {jenisGame}
-                                    </>
-                                ) : (
-                                    "Game"
-                                )}
-                                <span className="ml-2">{dropdownOpen ? '▲' : '▼'}</span>
+                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Nickname</label>
+                        <div className="flex flex-col gap-4 w-[100%]">
+
+                            <div>
+                                <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Nickname" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
                             </div>
-                            {dropdownOpen && (
-                                <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
-                                    {predefinedGames.map((game, index) => (
-                                        <div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100" onClick={() => handleGameChange(game.name)}>
-                                            <img className="h-[24px] w-auto rounded-sm mr-2" src={game.image} alt={game.name} />
-                                            {game.name}
-                                        </div>
-                                    ))}
+                            <div className="flex flex-col">
+                                <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Harga</label>
+                                <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Harga" type="number" value={harga} onChange={(e) => setHarga(e.target.value)} />
+                            </div>
+                            <div className="relative flex flex-col">
+                                <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Jenis Game</label>
+                                <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownJenisGameOpen(!dropdownJenisGameOpen)}>
+                                    {jenisGame ? (
+                                        <>
+                                            <img className="h-[24px] w-auto rounded-sm mr-2" src={dataGambarGame.find(game => game.name === jenisGame)?.image} alt={jenisGame} />
+                                            {jenisGame}
+                                        </>
+                                    ) : (
+                                        "Game"
+                                    )}
+                                    <span className="ml-2">{dropdownJenisGameOpen ? '▲' : '▼'}</span>
                                 </div>
-                            )}
+                                {dropdownJenisGameOpen && (
+                                    <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
+                                        {dataGambarGame.map((game, index) => (
+                                            <div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100" onClick={() => handleGameChange(game.name)}>
+                                                <img className="h-[24px] w-auto rounded-sm mr-2" src={game.image} alt={game.name} />
+                                                {game.name}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
                 <button className="bg-gradient-to-r from-[#2DAAE1] to-[#2D92CF] p-[10px] w-full h-[40px] overflow-hidden text-[#ffffff] rounded-md" type="submit">Kirim</button>
             </form>

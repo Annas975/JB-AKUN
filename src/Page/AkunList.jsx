@@ -3,7 +3,7 @@ import { useJB } from './context';
 import { faEye, faEyeSlash, faPenToSquare, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const predefinedGames = [
+const dataGambarGame = [
     { name: "Genshin Impact", image: "src/assets/genshin.png" },
     { name: "Mobile Legends", image: "src/assets/mobileLegends.png" },
     { name: "PUBG Mobile", image: "src/assets/PubgMobile.png" },
@@ -27,13 +27,12 @@ const AkunList = () => {
     const [harga, setHarga] = useState('');
     const [jenisGame, setJenisGame] = useState('');
     const [loginVia, setLoginVia] = useState('');
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false);
+    const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false);
     const [filteredNasabah, setFilteredNasabah] = useState([]);
     const [showPassword, setShowPassword] = useState(false);
     const handleTogglePassword = (e) => {
-        e.stopPropagation(); 
+        e.stopPropagation();
         setShowPassword(!showPassword);
     };
 
@@ -64,7 +63,7 @@ const AkunList = () => {
 
     const handleSearch = (event) => {
         const searchTerm = event.target.value.toLowerCase();
-        console.log("Search Term:", searchTerm); 
+        console.log("Search Term:", searchTerm);
         setSearchQuery(searchTerm);
     };
 
@@ -74,7 +73,7 @@ const AkunList = () => {
         } else {
             setLoginVia([...loginVia, login]);
         }
-        setIsDropdownOpen(false);
+        setViaIsLoginDropdownOpen(false);
     };
 
     const handleClick = (id) => {
@@ -94,7 +93,7 @@ const AkunList = () => {
             loginVia
         };
 
-        console.log('Updated Akun before sending to context:', updatedAkun); 
+        console.log('Updated Akun before sending to context:', updatedAkun);
         handleEditFormContex(updatedAkun);
         setShowEditForm(false);
     };
@@ -106,7 +105,7 @@ const AkunList = () => {
     const handleEdit = (id) => {
         const akunToEdit = dataAkun.find(akun => akun.id === id);
         setEditedAkun(akunToEdit);
-        setNickname(akunToEdit.nickname); 
+        setNickname(akunToEdit.nickname);
         setEmail(akunToEdit.email);
         setPassword(akunToEdit.password);
         setHarga(akunToEdit.harga);
@@ -188,9 +187,9 @@ const AkunList = () => {
                                         </div>
 
                                         <div >
-                                          
+
                                             <div className="flex flex-col relative">
-                                            <label htmlFor="">Password</label>
+                                                <label htmlFor="">Password</label>
                                                 <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]"
                                                     placeholder="Password"
                                                     type={showPassword ? "text" : "password"}
@@ -219,21 +218,23 @@ const AkunList = () => {
 
                                         <div className="relative">
                                             <label htmlFor="">Jenis Game</label>
-                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownJenisGameOpen(!dropdownJenisGameOpen)}>
                                                 {jenisGame ? (
                                                     <>
-                                                        <img className="h-[24px] w-auto rounded-sm mr-2" src={predefinedGames.find(game => game.name === jenisGame)?.image} alt={jenisGame} />
+                                                        <img className="h-[24px] w-auto rounded-sm mr-2" src={dataGambarGame.find(game => game.name === jenisGame)?.image} alt={jenisGame} />
                                                         {jenisGame}
                                                     </>
                                                 ) : (
                                                     "Game"
                                                 )}
-                                                <span className="ml-2">{dropdownOpen ? '▲' : '▼'}</span>
+                                                <span className="ml-2">{dropdownJenisGameOpen ?
+                                                    '▲' :
+                                                    '▼'}</span>
                                             </div>
-                                            {dropdownOpen && (
+                                            {dropdownJenisGameOpen && (
                                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
-                                                    {predefinedGames.map((game, index) => (
-                                                        <div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100" onClick={() => { setJenisGame(game.name); setDropdownOpen(false); }}>
+                                                    {dataGambarGame.map((game, index) => (
+                                                        <div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100" onClick={() => { setJenisGame(game.name); setDropdownJenisGameOpen(false); }}>
                                                             <img className="h-[24px] w-auto rounded-sm mr-2" src={game.image} alt={game.name} />
                                                             {game.name}
                                                         </div>
@@ -243,11 +244,15 @@ const AkunList = () => {
                                         </div>
                                         <div className="relative">
                                             <label htmlFor="">Via Login</label>
-                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}>
-                                                {loginVia.length > 0 ? loginVia.join(', ') : "Login"}
-                                                <span className="ml-2">{isDropdownOpen ? '▲' : '▼'}</span>
+                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
+                                                {loginVia.length > 0 ?
+                                                    loginVia.join(', ')
+                                                    : "Login"}
+                                                <span className="ml-2">{viaLoginDropdownOpen ?
+                                                    '▲' :
+                                                    '▼'}</span>
                                             </div>
-                                            {loginDropdownOpen && (
+                                            {viaLoginDropdownOpen && (
                                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10 ">
                                                     {loginOptions.map((option, index) => (
                                                         <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ? 'bg-[#2D92CF] text-white' : ''}`} onClick={() => handleLoginChange(option)} >
@@ -317,7 +322,7 @@ const AkunList = () => {
                                     <td className='py-2 px-4 mx-[30px]'>
                                         <div className='flex items-center mx-[30px]'>
                                             <img
-                                                src={predefinedGames.find(game => game.name === akun.jenisGame)?.image || '/src/assets/default.png'}
+                                                src={dataGambarGame.find(game => game.name === akun.jenisGame)?.image || '/src/assets/default.png'}
                                                 alt={akun.jenisGame}
                                                 className='w-12 h-12 mr-2'
                                             />
