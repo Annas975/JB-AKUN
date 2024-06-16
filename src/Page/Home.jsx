@@ -1,3 +1,8 @@
+/**
+ * Komponen untuk halaman utama (Home).
+ * 
+ * @returns {JSX.Element} Komponen halaman utama untuk menampikan judul dan gambar game yang tersedia di JB AKUN
+ */
 const Home = () => {
     return (
         <>

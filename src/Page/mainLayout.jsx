@@ -2,6 +2,12 @@ import Home from "./Home";
 import AddAkun from "./AddAkun";
 import AkunList from "./AkunList";
 import Copyright from "./Copyright";
+
+/**
+ * Komponen untuk layout utama aplikasi.
+ * 
+ * @returns {JSX.Element} Komponen layout utama yang menampilkan semua komponent secara urut.
+ */
 const MainLayout = () => {
    return (
       <>

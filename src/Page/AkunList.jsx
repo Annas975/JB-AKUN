@@ -3,6 +3,7 @@ import { useJB } from './context';
 import { faEye, faEyeSlash, faPenToSquare, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
 const dataGambarGame = [
     { name: "Genshin Impact", image: "src/assets/genshin.png" },
     { name: "Mobile Legends", image: "src/assets/mobileLegends.png" },
@@ -12,38 +13,47 @@ const dataGambarGame = [
 
 const loginOptions = ["Game", "Facebook", "Google", "iOS", "Tweeter", "VK", "Tiktok"];
 
+/**
+ * Komponent untuk menampilkan daftar akun
+ * 
+ * @returns {JSX.Element} Komponen Daftar Akun Akun
+ */
 const AkunList = () => {
-    const { dataAkun, handleEditFormContex, handleDeleteContext } = useJB();
+    const { dataAkun, handleEditFormContex, handleDeleteContext } = useJB(); 
 
-    const [currentId, setCurrentId] = useState(null);
-    const [searchAkun, setSearchAkun] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(20);
-    const [showEditForm, setShowEditForm] = useState(false);
-    const [editedAkun, setEditedAkun] = useState(null);
-    const [nickname, setNickname] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [harga, setHarga] = useState('');
-    const [jenisGame, setJenisGame] = useState('');
-    const [loginVia, setLoginVia] = useState('');
-    const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false);
-    const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false);
-    const [viaIsLoginDropdownOpenTerus, setViaIsLoginDropdownOpenTerus] = useState(false);
+    const [currentId, setCurrentId] = useState(null); // ID akun yang sedang aktif
+    const [searchAkun, setSearchAkun] = useState(''); // state pencarian untuk filter daftar akun
+    const [currentPage, setCurrentPage] = useState(1); // Halamam saat ini yang sedang ditampilkan
+    const [itemsPerPage] = useState(20); // Jumlah item per halaman
+    const [showEditForm, setShowEditForm] = useState(false); // Status menampilkan form edit akun
+    const [editedAkun, setEditedAkun] = useState(null); // akun yang sedang di edit
+    const [nickname, setNickname] = useState(''); // State untuk nickname akun yang sedang diedit 
+    const [email, setEmail] = useState(''); // State untuk email akun yang sedang diedit
+    const [password, setPassword] = useState(''); // State untuk harga akun yang sedang diedit 
+    const [harga, setHarga] = useState(''); // State untuk jenis game akun yang sedang diedit 
+    const [jenisGame, setJenisGame] = useState(''); // State untuk email akun yang sedang diedit
+    const [loginVia, setLoginVia] = useState(''); // State untuk metode login akun game yang sedang diedit
+    const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false); // status dropdown jenis game terbuka/tertutup
+    const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false); // Status dropdown metode login terbuka/tertutup
+    const [viaIsLoginDropdownOpenTerus, setViaIsLoginDropdownOpenTerus] = useState(false); // Status dropdown metode login selalu terbuka
 
-    const [filteredAkun, setFilteredAkun] = useState([]);
-    const [showPassword, setShowPassword] = useState(false);
+    const [filteredAkun, setFilteredAkun] = useState([]); //  Array Data akun yang sudah difilter berdasarkan pencarian
+    const [showPassword, setShowPassword] = useState(false); // Status tampilan password terlihat atau tidak(******)
     const handleTogglePassword = (e) => {
         e.stopPropagation();
         setShowPassword(!showPassword);
     };
 
-    console.log(filteredAkun)
-
+    /**
+     * useEffect untuk mengatur data akun yang difilter ketika dataAkun berubah
+     */
     useEffect(() => {
         setFilteredAkun(dataAkun);
     }, [dataAkun]);
 
+    /**
+     * useEffect untuk memfilter data akun berdasarkan pencarian state searchAkun.
+     */
     useEffect(() => {
         const filteredData = dataAkun.filter(n => {
             return (
@@ -61,11 +71,21 @@ const AkunList = () => {
         setFilteredAkun(filteredData);
     }, [searchAkun, dataAkun]);
 
+    /**
+     * Handler untuk memperbarui nilai pencarian state searchAkun
+     * 
+     * @param {event} event event dari input pencarian 
+     */
     const handleSearch = (event) => {
         const searchDataAkun = event.target.value.toLowerCase();
         setSearchAkun(searchDataAkun);
     };
 
+    /**
+     * Handler untuk mengubah metode via login pada akun yang sedang diedit.
+     * 
+     * @param {string} login Metode login yang dipilih
+     */
     const handleLoginChange = (login) => {
         if (loginVia.includes(login)) {
             setLoginVia(loginVia.filter(item => item !== login));
@@ -75,11 +95,27 @@ const AkunList = () => {
         setViaIsLoginDropdownOpenTerus(false);
     };
 
+    /**
+     * Handler untuk mengatur ID akun saat ini yang sedang aktif.
+     * 
+     * @param {number} id ID akun yang sedang di-klik
+     */
     const handleClick = (id) => {
         setCurrentId(id);
     };
 
+    /**
+     * Handler untuk menyimpan perubahan pada form edit akun. 
+     */
     const handleEditForm = async () => {
+        if (!nickname || !email || !password || !harga){
+            return alert('semua field harus diisi')
+        } else if (!jenisGame || loginVia.length === 0) {
+             alert("pilih option pada dropdown!")
+             return
+        }
+         
+
         if (!editedAkun) return;
 
         const updatedAkun = {
@@ -92,15 +128,28 @@ const AkunList = () => {
             loginVia
         };
 
-        console.log('Updated Akun before sending to context:', updatedAkun);
         handleEditFormContex(updatedAkun);
         setShowEditForm(false);
     };
 
+    /**
+     * Handler untuk menghapus akun berdasarkan ID.
+     * 
+     * @param {number} id ID akn yang akan di hapus. 
+     */
     const handleDelete = (id) => {
-        handleDeleteContext(id);
-    };
+        // Menampilkan alert konfirmasi sebelum menghapus
+        if (window.confirm("Apakah Anda yakin ingin menghapus akun ini?")) {
+            // memanggil fungsi handleDeleteContext untuk menghapus akun
+            handleDeleteContext(id);
+        }
+    }
 
+    /**
+     * Handler untuk memulai proses edit pada akun berdasarkan ID.
+     * 
+     * @param {number} id ID akun yang akan diedit.
+     */
     const handleEdit = (id) => {
         const akunToEdit = dataAkun.find(akun => akun.id === id);
         setEditedAkun(akunToEdit);
@@ -113,10 +162,18 @@ const AkunList = () => {
         setShowEditForm(true);
     };
 
+    /**
+     * Handler untuk menutup form edit akun.
+     */
     const handleClose = () => {
         setShowEditForm(false);
     };
 
+    /**
+     * Handler untuk mengubah urutan data berdasarkan harga.
+     * 
+     * @param {event} event Event dari select untuk pengurutan
+     */
     const handleSortChange = (event) => {
         const sortOption = event.target.value;
         let sortedData;
@@ -128,15 +185,32 @@ const AkunList = () => {
         setFilteredAkun(sortedData);
     };
 
+    /**
+     * Menghitung indeks item terakhir yang ditampilkan dihalaman saat ini.
+     */
     const indexOfLastItem = currentPage * itemsPerPage;
+
+    /**
+     * Menghitung indeks item pertama yang ditampilkan dihalaman saat ini.
+     */
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+    /**
+     * Mengambil data akun yang akan ditampilkan dihalaman saat ini.
+     */
     const currentItems = filteredAkun.slice(indexOfFirstItem, indexOfLastItem);
 
+    /**
+     * Membuat array halaman berdasarkan jumlah data akun.
+     */
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(filteredAkun.length / itemsPerPage); i++) {
         pageNumbers.push(i);
     }
 
+    /**
+     * Mendapatkan elemen halaman angka berdasarkan pageNumbers.
+     */
     const renderPageNumbers = pageNumbers.map(number => (
         <li
             key={number}
@@ -274,7 +348,7 @@ const AkunList = () => {
                                             onClick={handleEditForm}
                                             className="bg-[#2D92CF] hover:bg-[#2D92CF] text-white px-4 py-2 rounded"
                                         >
-                                            Save
+                                            Simpan Perubahan
                                         </button>
                                     </div>
                                 </div>

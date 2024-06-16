@@ -3,22 +3,34 @@ import { useJB } from "./context";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
+/**
+ * Komponen AddAkun digunakan untuk menambahkan akun baru.
+ * 
+ * @component
+ */
 const AddAkun = () => {
     const { handleAddAkun } = useJB();
 
+    // State untuk menyimpan nilai input
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [harga, setHarga] = useState('');
     const [jenisGame, setJenisGame] = useState('');
     const [nickname, setNickname] = useState('');
-    const [loginVia, setLoginVia] = useState('');
+    const [loginVia, setLoginVia] = useState([]);
     const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false);
     const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false);
+    const [viaIsLoginDropdownOpenTerus, setViaIsLoginDropdownOpenTerus] = useState(false)
     const [showPassword, setShowPassword] = useState(false);
+
+    /**
+     * Mengubah status tampilan password antara tersembunyi dan terlihat.
+     */
     const handleTogglePassword = () => {
         setShowPassword(!showPassword);
     };
 
+    // Data gambar untuk jenis game
     const dataGambarGame = [
         { name: "Genshin Impact", image: "./src/assets/genshin.png" },
         { name: "Mobile Legends", image: "./src/assets/mobileLegends.png" },
@@ -26,33 +38,51 @@ const AddAkun = () => {
         { name: "Free Fire", image: "./src/assets/ff.png" },
     ];
 
+    // Pilihan untuk login
     const loginOptions = ["Game", "Facebook", "Google", "iOS", "Tweeter", "VK", "Tiktok"];
 
+    /**
+     * Mengatur jenis game yang dipilih dari dropdown.
+     * 
+     * @param {string} game - Nama game yang dipilih.
+     */
     const handleGameChange = (game) => {
         setJenisGame(game);
         setDropdownJenisGameOpen(false);
     };
 
+    /**
+     * Mengatur metode login yang dipilih dari dropdown.
+     * 
+     * @param {string} login - Metode login yang dipilih.
+     */
     const handleLoginChange = (login) => {
         if (loginVia.includes(login)) {
             setLoginVia(loginVia.filter(item => item !== login));
         } else {
             setLoginVia([...loginVia, login]);
         }
-        viaLoginDropdownOpen(false);
+        setViaIsLoginDropdownOpenTerus(false);
     };
 
+    /**
+     * Menangani pengiriman formulir.
+     * 
+     * @param {Event} event - Event pengiriman formulir.
+     */
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        // Validasi input
         if (!email || !password || !harga || !nickname) {
             alert("Semua inputan harus diisi!");
             return;
         } else if (!jenisGame || loginVia.length === 0) {
-            alert("Pilih option terlebih dahulu");
+            alert("pilih option pada dropdown!");
             return;
         }
 
+        // Membuat objek akun baru
         const newAkun = {
             nickname,
             email,
@@ -65,6 +95,7 @@ const AddAkun = () => {
 
         try {
             await handleAddAkun(newAkun);
+            // Mengosongkan input setelah berhasil menambahkan akun
             setNickname('');
             setEmail('');
             setPassword('');
@@ -77,45 +108,43 @@ const AddAkun = () => {
     };
 
     return (
-        <div className="flex flex-col justify-between w-[100%] h-[50%] mb-[50px] pr-[30px] sm:mt-[80px] mt-[250px] ">
-            <form className="flex flex-col gap-4 w-full p-[20px] bg-[#ffffff] m-[20px]  border-gray-300 rounded shadow-lg z-10" onSubmit={handleSubmit}>
+        <div className="flex flex-col justify-between w-[100%] h-[50%] mb-[50px] pr-[30px] sm:mt-[80px] mt-[250px]">
+            <form className="flex flex-col gap-4 w-full p-[20px] bg-[#ffffff] m-[20px] border-gray-300 rounded shadow-lg z-10" onSubmit={handleSubmit}>
                 <div className="flex flex-col">
-                    <div className="p-4 flex  justify-center">
+                    <div className="p-4 flex justify-center">
                         <h1>Tambah Akun</h1>
                     </div>
                 </div>
                 <div className="flex gap-4">
                     <div className="flex flex-col gap-4 w-[50%]">
                         <div className="flex flex-col">
-                            <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Email</label>
+                            <label className="flex" htmlFor="email"><p className="text-[#f00]">*</p>Email</label>
                             <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="flex flex-col relative">
-                            <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Password</label>
+                            <label className="flex" htmlFor="password"><p className="text-[#f00]">*</p>Password</label>
                             <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]"
                                 placeholder="Password"
                                 type={showPassword ?
-                                    "text"
-                                    :
+                                    "text" :
                                     "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)} />
                             <button
                                 type="button"
-                                className="absolute top-[70%] right-[10px] transform -translate-y-1/2 flex items-center px-3 text-[#2D92CF] focus:outline-none placeholder:Masukkan password"
+                                className="absolute top-[70%] right-[10px] transform -translate-y-1/2 flex items-center px-3 text-[#2D92CF] focus:outline-none"
                                 onClick={handleTogglePassword}
                             >
                                 <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
                             </button>
                         </div>
                         <div className="relative flex flex-col">
-                            <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Via Login</label>
+                            <label className="flex" htmlFor="loginVia"><p className="text-[#f00]">*</p>Via Login</label>
                             <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
                                 {loginVia.length > 0 ?
-                                    loginVia.join(', ')
-                                    :
+                                    loginVia.join(', ') :
                                     "Login"}
-                                <span className="ml-2">{viaLoginDropdownOpen ?
+                                <span className="ml-2">{viaIsLoginDropdownOpenTerus ?
                                     '▲'
                                     :
                                     '▼'}</span>
@@ -123,10 +152,7 @@ const AddAkun = () => {
                             {viaLoginDropdownOpen && (
                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
                                     {loginOptions.map((option, index) => (
-                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ?
-                                            'bg-[#2D92CF] text-white'
-                                            :
-                                            ''}`} onClick={() => handleLoginChange(option)} >
+                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 hover:bg-[#8CD2FD] ${loginVia.includes(option) ? 'bg-[#2D92CF] text-white' : ''}`} onClick={() => handleLoginChange(option)} >
                                             {option}
                                         </div>
                                     ))}
@@ -136,18 +162,17 @@ const AddAkun = () => {
                     </div>
 
                     <div className="flex flex-col w-[50%]">
-                        <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Nickname</label>
+                        <label className="flex" htmlFor="nickname"><p className="text-[#f00]">*</p>Nickname</label>
                         <div className="flex flex-col gap-4 w-[100%]">
-
                             <div>
                                 <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Nickname" type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
                             </div>
                             <div className="flex flex-col">
-                                <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Harga</label>
+                                <label className="flex" htmlFor="harga"><p className="text-[#f00]">*</p>Harga</label>
                                 <input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]" placeholder="Harga" type="number" value={harga} onChange={(e) => setHarga(e.target.value)} />
                             </div>
                             <div className="relative flex flex-col">
-                                <label className="flex" htmlFor=""><p className="text-[#f00]">*</p>Jenis Game</label>
+                                <label className="flex" htmlFor="jenisGame"><p className="text-[#f00]">*</p>Jenis Game</label>
                                 <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownJenisGameOpen(!dropdownJenisGameOpen)}>
                                     {jenisGame ? (
                                         <>

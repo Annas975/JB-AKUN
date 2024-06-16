@@ -1,5 +1,8 @@
-
-
+/**
+ * Komponen untuk menampilkan informasi hak cipta.
+ * 
+ * @returns {JSX.Element} Komponen hak cipta
+ */
 const Copyright = () => {
     return (
         <div className="text-center text-gray-500">

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: AkunList.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: AkunList.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useState, useEffect } from 'react';
+import { useJB } from './context';
+import { faEye, faEyeSlash, faPenToSquare, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+/**
+ * Komponen untuk menampilkan daftar akun.
+ * 
+ * @returns {JSX.Element} Komponen daftar akun
+ */
+const AkunList = () => {
+    const { dataAkun, handleEditFormContex, handleDeleteContext } = useJB();
+
+    const [currentId, setCurrentId] = useState(null); // ID akun yang sedang aktif
+    const [searchAkun, setSearchAkun] = useState(''); // String pencarian untuk filter daftar akun
+    const [currentPage, setCurrentPage] = useState(1); // Halaman saat ini yang sedang ditampilkan
+    const [itemsPerPage] = useState(20); // Jumlah item per halaman
+    const [showEditForm, setShowEditForm] = useState(false); // Status tampilan form edit akun
+    const [editedAkun, setEditedAkun] = useState(null); // Akun yang sedang diedit
+    const [nickname, setNickname] = useState(''); // State untuk nickname akun yang sedang diedit
+    const [email, setEmail] = useState(''); // State untuk email akun yang sedang diedit
+    const [password, setPassword] = useState(''); // State untuk password akun yang sedang diedit
+    const [harga, setHarga] = useState(''); // State untuk harga akun yang sedang diedit
+    const [jenisGame, setJenisGame] = useState(''); // State untuk jenis game akun yang sedang diedit
+    const [loginVia, setLoginVia] = useState([]); // State untuk metode login akun yang sedang diedit
+    const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false); // Status dropdown jenis game terbuka/tutup
+    const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false); // Status dropdown metode login terbuka/tutup
+    const [viaIsLoginDropdownOpenTerus, setViaIsLoginDropdownOpenTerus] = useState(false); // Status dropdown metode login terus terbuka/tutup
+    const [filteredAkun, setFilteredAkun] = useState([]); // Data akun yang sudah difilter berdasarkan pencarian
+    const [showPassword, setShowPassword] = useState(false); // Status tampilan password terlihat/tidak
+
+    /**
+     * Efek samping untuk mengatur data akun yang difilter ketika dataAkun berubah.
+     */
+    useEffect(() => {
+        setFilteredAkun(dataAkun);
+    }, [dataAkun]);
+
+    /**
+     * Efek samping untuk memfilter data akun berdasarkan pencarian searchAkun.
+     */
+    useEffect(() => {
+        const filteredData = dataAkun.filter(n => {
+            return (
+                n.nickname.toLowerCase().includes(searchAkun) ||
+                n.email.toLowerCase().includes(searchAkun) ||
+                n.password.toLowerCase().includes(searchAkun) ||
+                n.harga.toString().includes(searchAkun) ||
+                n.jenisGame.toLowerCase().includes(searchAkun) ||
+                ((n.loginVia)
+                    ? n.loginVia.some(via => via.toLowerCase().includes(searchAkun))
+                    :
+                    n.loginVia.toLowerCase().includes(searchAkun))
+            );
+        });
+        setFilteredAkun(filteredData);
+    }, [searchAkun, dataAkun]);
+
+    /**
+     * Handler untuk memperbarui nilai pencarian searchAkun.
+     * 
+     * @param {Event} event Event dari input pencarian
+     */
+    const handleSearch = (event) => {
+        const searchDataAkun = event.target.value.toLowerCase();
+        setSearchAkun(searchDataAkun);
+    };
+
+    /**
+     * Handler untuk mengubah metode login pada akun yang sedang diedit.
+     * 
+     * @param {string} login Metode login yang dipilih
+     */
+    const handleLoginChange = (login) => {
+        if (loginVia.includes(login)) {
+            setLoginVia(loginVia.filter(item => item !== login));
+        } else {
+            setLoginVia([...loginVia, login]);
+        }
+        setViaIsLoginDropdownOpenTerus(false);
+    };
+
+    /**
+     * Handler untuk mengatur ID akun saat ini yang sedang aktif.
+     * 
+     * @param {number} id ID akun yang di-klik
+     */
+    const handleClick = (id) => {
+        setCurrentId(id);
+    };
+
+    /**
+     * Handler untuk menyimpan perubahan pada form edit akun.
+     */
+    const handleEditForm = async () => {
+        if (!editedAkun) return;
+
+        const updatedAkun = {
+            ...editedAkun,
+            nickname,
+            email,
+            password,
+            harga,
+            jenisGame,
+            loginVia
+        };
+
+        console.log('Updated Akun before sending to context:', updatedAkun);
+        handleEditFormContex(updatedAkun);
+        setShowEditForm(false);
+    };
+
+    /**
+     * Handler untuk menghapus akun berdasarkan ID.
+     * 
+     * @param {number} id ID akun yang akan dihapus
+     */
+    const handleDelete = (id) => {
+        handleDeleteContext(id);
+    };
+
+    /**
+     * Handler untuk memulai proses edit pada akun berdasarkan ID.
+     * 
+     * @param {number} id ID akun yang akan di-edit
+     */
+    const handleEdit = (id) => {
+        const akunToEdit = dataAkun.find(akun => akun.id === id);
+        setEditedAkun(akunToEdit);
+        setNickname(akunToEdit.nickname);
+        setEmail(akunToEdit.email);
+        setPassword(akunToEdit.password);
+        setHarga(akunToEdit.harga);
+        setJenisGame(akunToEdit.jenisGame);
+        setLoginVia(akunToEdit.loginVia);
+        setShowEditForm(true);
+    };
+
+    /**
+     * Handler untuk menutup form edit akun.
+     */
+    const handleClose = () => {
+        setShowEditForm(false);
+    };
+
+    /**
+     * Handler untuk mengubah urutan data berdasarkan harga.
+     * 
+     * @param {Event} event Event dari select box untuk pengurutan
+     */
+    const handleSortChange = (event) => {
+        const sortOption = event.target.value;
+        let sortedData;
+        if (sortOption === 'highest') {
+            sortedData = [...filteredAkun].sort((a, b) => b.harga - a.harga);
+        } else if (sortOption === 'lowest') {
+            sortedData = [...filteredAkun].sort((a, b) => a.harga - b.harga);
+        }
+        setFilteredAkun(sortedData);
+    };
+
+    /**
+     * Menghitung indeks item terakhir yang ditampilkan di halaman saat ini.
+     */
+    const indexOfLastItem = currentPage * itemsPerPage;
+
+    /**
+     * Menghitung indeks item pertama yang ditampilkan di halaman saat ini.
+     */
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+    /**
+     * Mengambil data akun yang akan ditampilkan di halaman saat ini.
+     */
+    const currentItems = filteredAkun.slice(indexOfFirstItem, indexOfLastItem);
+
+    /**
+     * Membuat array halaman berdasarkan jumlah data akun.
+     */
+    const pageNumbers = [];
+    for (let i = 1; i &lt;= Math.ceil(filteredAkun.length / itemsPerPage); i++) {
+        pageNumbers.push(i);
+    }
+
+    /**
+     * Mendapatkan elemen halaman angka berdasarkan pageNumbers.
+     */
+    const renderPageNumbers = pageNumbers.map(number => (
+        &lt;li
+            key={number}
+            className={`px-3 py-1 ${currentPage === number ?
+                'bg-gray-300'
+                :
+                'bg-white'} border border-gray-300 cursor-pointer`}
+            onClick={() => setCurrentPage(number)}
+        >
+            {number}
+        &lt;/li>
+    ));
+
+    return (
+        &lt;div className='bg-[#99A1B7] w-full p-5'>
+            &lt;div className='flex flex-col mr-[50px] w-full gap-5 mt-[50px]'>
+                &lt;div className='bg-[#ffffff] w-full p-4 border-gray-300 rounded shadow-lg z-10'>
+                    &lt;div className='flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 md:space-x-4'>
+                        {showEditForm &amp;&amp; (
+                            &lt;div className="fixed inset-0 flex items-center justify-center bg-[#0000009f] z-50">
+                                &lt;div className="bg-white p-6 rounded shadow-lg">
+                                    &lt;button
+                                        className=""
+                                        onClick={handleClose}
+                                    >
+                                        &lt;FontAwesomeIcon icon={faXmark} />
+                                    &lt;/button>
+                                    &lt;h1 className="text-center text-2xl font-bold text-[#2D92CF] mb-4">Edit Akun&lt;/h1>
+                                    &lt;div className="flex flex-col gap-4">
+                                        &lt;div className='flex flex-col'>
+                                            &lt;label htmlFor="">Nickname&lt;/label>
+                                            &lt;input
+                                                type="text"
+                                                placeholder="Nickname"
+                                                className="border border-gray-300 rounded px-4 py-2"
+                                                value={nickname}
+                                                onChange={(e) => setNickname(e.target.value)}
+                                            />
+                                        &lt;/div>
+
+                                        &lt;div className='flex flex-col'>
+                                            &lt;label htmlFor="">Email&lt;/label>
+                                            &lt;input
+                                                type="email"
+                                                placeholder="Email"
+                                                className="border border-gray-300 rounded px-4 py-2"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                        &lt;/div>
+
+                                        &lt;div >
+
+                                            &lt;div className="flex flex-col relative">
+                                                &lt;label htmlFor="">Password&lt;/label>
+                                                &lt;input className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px]"
+                                                    placeholder="Password"
+                                                    type={showPassword ? "text" : "password"}
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)} />
+                                                &lt;button
+                                                    type="button"
+                                                    className="absolute top-[70%] right-[10px] transform -translate-y-1/2 flex items-center px-3 text-[#2D92CF] focus:outline-none placeholder:Masukkan password"
+                                                    onClick={handleTogglePassword}
+                                                >
+                                                    &lt;FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                                                &lt;/button>
+                                            &lt;/div>
+                                        &lt;/div>
+
+                                        &lt;div className='flex flex-col'>
+                                            &lt;label htmlFor="">Harga&lt;/label>
+                                            &lt;input
+                                                type="number"
+                                                placeholder="Harga"
+                                                className="border border-gray-300 rounded px-4 py-2"
+                                                value={harga}
+                                                onChange={(e) => setHarga(Number(e.target.value))}
+                                            />
+                                        &lt;/div>
+
+                                        &lt;div className="relative">
+                                            &lt;label htmlFor="">Jenis Game&lt;/label>
+                                            &lt;div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownJenisGameOpen(!dropdownJenisGameOpen)}>
+                                                {jenisGame ? (
+                                                    &lt;>
+                                                        &lt;img className="h-[24px] w-auto rounded-sm mr-2" src={dataGambarGame.find(game => game.name === jenisGame)?.image} alt={jenisGame} />
+                                                        {jenisGame}
+                                                    &lt;/>
+                                                ) : (
+                                                    "Game"
+                                                )}
+                                                &lt;span className="ml-2">{dropdownJenisGameOpen ?
+                                                    '▲' :
+                                                    '▼'}&lt;/span>
+                                            &lt;/div>
+                                            {dropdownJenisGameOpen &amp;&amp; (
+                                                &lt;div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
+                                                    {dataGambarGame.map((game, index) => (
+                                                        &lt;div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100" onClick={() => { setJenisGame(game.name); setDropdownJenisGameOpen(false); }}>
+                                                            &lt;img className="h-[24px] w-auto rounded-sm mr-2" src={game.image} alt={game.name} />
+                                                            {game.name}
+                                                        &lt;/div>
+                                                    ))}
+                                                &lt;/div>
+                                            )}
+                                        &lt;/div>
+                                        &lt;div className="relative">
+                                            &lt;label htmlFor="">Via Login&lt;/label>
+                                            &lt;div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
+                                                {loginVia.length > 0 ?
+                                                    loginVia.join(', ')
+                                                    :
+                                                    "Login"}
+                                                &lt;span className="ml-2">{viaIsLoginDropdownOpenTerus ?
+                                                    '▲' :
+                                                    '▼'}&lt;/span>
+                                            &lt;/div>
+                                            {viaLoginDropdownOpen &amp;&amp; (
+                                                &lt;div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10 ">
+                                                    {loginOptions.map((option, index) => (
+                                                        &lt;div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 ${loginVia.includes(option) ?
+                                                            'bg-[#2D92CF] text-white'
+                                                            :
+                                                            ''}`} onClick={() => handleLoginChange(option)} >
+                                                            {option}
+                                                        &lt;/div>
+                                                    ))}
+                                                &lt;/div>
+                                            )}
+                                        &lt;/div>
+
+
+                                        &lt;button
+                                            onClick={handleEditForm}
+                                            className="bg-[#2D92CF] hover:bg-[#2D92CF] text-white px-4 py-2 rounded"
+                                        >
+                                            Save
+                                        &lt;/button>
+                                    &lt;/div>
+                                &lt;/div>
+                            &lt;/div>
+                        )}
+
+                        &lt;input
+                            type="search"
+                            value={searchAkun}
+                            onChange={handleSearch}
+                            placeholder="Search"
+                            className='w-full p-2 rounded border border-gray-300'
+                        />
+
+                        &lt;select
+                            onChange={handleSortChange}
+                            defaultValue=""
+                            className='w-full md:w-auto p-2 rounded border border-gray-300'
+                        >
+                            &lt;option value="" disabled>Sort by Harga&lt;/option>
+                            &lt;option value="highest">Harga tertinggi&lt;/option>
+                            &lt;option value="lowest">Harga Terendah&lt;/option>
+                        &lt;/select>
+                    &lt;/div>
+                &lt;/div>
+
+                &lt;div className='overflow-x-auto bg-[#ffffff] p-[20px] border-gray-300 rounded shadow-lg z-60'>
+                    &lt;table className='min-w-full bg-white'>
+                        &lt;thead className='bg-[#2D92CF] text-white'>
+                            &lt;tr>
+                                &lt;th className='py-2 px-4'>Nickname&lt;/th>
+                                &lt;th className='py-2 px-4'>Email&lt;/th>
+                                &lt;th className='py-2 px-4'>Password&lt;/th>
+                                &lt;th className='py-2 px-4'>Harga&lt;/th>
+                                &lt;th className='py-2 px-4'>Jenis Game&lt;/th>
+                                &lt;th className='py-2 px-4'>Login via&lt;/th>
+                                &lt;th className='py-2'>Action&lt;/th>
+                            &lt;/tr>
+                        &lt;/thead>
+                        &lt;tbody>
+                            {currentItems.map((akun) => (
+                                &lt;tr
+                                    key={akun.id}
+                                    className={`border-b ${currentId === akun.id ? 'bg-gray-200' : 'bg-gray-100'} hover:bg-gray-300`}
+                                    onClick={() => handleClick(akun.id)}
+                                >
+                                    &lt;td className='py-2 px-4'>{akun.nickname}&lt;/td>
+                                    &lt;td className='py-2 px-4'>{akun.email}&lt;/td>
+                                    &lt;td className='py-2 px-4'>{akun.password}&lt;/td>
+                                    &lt;td className='py-2 px-4'>{akun.harga.toLocaleString()}&lt;/td>
+                                    &lt;td className='py-2 px-4 mx-[30px]'>
+                                        &lt;div className='flex items-center mx-[30px]'>
+                                            &lt;img
+                                                src={dataGambarGame.find(game => game.name === akun.jenisGame)?.image || '/src/assets/default.png'}
+                                                alt={akun.jenisGame}
+                                                className='w-12 h-12 mr-2'
+                                            />
+                                            &lt;span>{akun.jenisGame}&lt;/span>
+                                        &lt;/div>
+                                    &lt;/td>
+                                    &lt;td className='py-2 px-4 mx-[30px]'>{(akun.loginVia) ?
+                                        akun.loginVia.join(', ')
+                                        :
+                                        akun.loginVia}&lt;/td>
+                                    &lt;td className='py-2 flex gap-2 items-center justify-center'>
+                                        &lt;button onClick={() => handleEdit(akun.id)} className='bg-[#2D92CF] text-white px-2 py-1 rounded mx-1'>&lt;FontAwesomeIcon icon={faPenToSquare} />&lt;/button>
+                                        &lt;button onClick={() => handleDelete(akun.id)} className='bg-[#2D92CF] text-white px-2 py-1 rounded mx-1'>&lt;FontAwesomeIcon icon={faTrashCan} />&lt;/button>
+                                    &lt;/td>
+                                &lt;/tr>
+                            ))}
+                        &lt;/tbody>
+                    &lt;/table>
+                &lt;/div>
+            &lt;/div>
+            &lt;div>
+                &lt;ul className="flex justify-center mt-4">
+                    {renderPageNumbers}
+                &lt;/ul>
+            &lt;/div>
+        &lt;/div>
+    );
+};
+
+export default AkunList;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#AkunList">AkunList</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Sun Jun 16 2024 12:37:30 GMT+0700 (Indochina Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
