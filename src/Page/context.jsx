@@ -45,19 +45,15 @@ const JBProvider = ({ children }) => {
     /**
       * Mengambil data akun dari localStorage.
       * Jika data akun tersimpan di localStorage, maka mengambil data tersebut.
-      * Data yang berhasil diambil baik dari localStorage akan disimpan kembali ke state dataAkun
+      * Data yang berhasil diambil dari localStorage akan disimpan kembali ke state dataAkun
       */
     const fetchDataAkun = async () => {
         // Mengambil data dari localStorage dengan kunci 'dataAkun'
         const storedData = localStorage.getItem('dataAkun');
-
-        // Jika data ada di localStorage
-        if (storedData) {
-            // mengubah JSON dari localStorage menjadi objek JavaScript
-            const parsedData = JSON.parse(storedData);
-            // memasukan data yang telah dirubah menjadi javascript kedalam state dataAkun
-            setDataAkun(parsedData);
-        }
+        // mengubah JSON dari localStorage menjadi objek JavaScript
+        const parsedData = JSON.parse(storedData);
+        // memasukan data yang telah dirubah menjadi javascript kedalam state dataAkun
+        setDataAkun(parsedData);
     };
 
     /**
