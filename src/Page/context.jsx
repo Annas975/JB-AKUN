@@ -3,7 +3,6 @@
 /* eslint-disable react/prop-types */
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { FetchData } from './data';
 
 /**
  * Status awal untuk context JB.
@@ -44,10 +43,9 @@ const JBProvider = ({ children }) => {
     const [dataAkun, setDataAkun] = useState([]);
 
     /**
-      * Mengambil data akun dari localStorage atau dari API.
+      * Mengambil data akun dari localStorage.
       * Jika data akun tersimpan di localStorage, maka mengambil data tersebut.
-      * Jika tidak ada data di localStorage, maka melakukan pemanggilan API untuk mendapatkan data baru.
-      * Data yang berhasil diambil baik dari localStorage atau dari API akan disimpan kembali ke state dataAkun
+      * Data yang berhasil diambil baik dari localStorage akan disimpan kembali ke state dataAkun
       */
     const fetchDataAkun = async () => {
         // Mengambil data dari localStorage dengan kunci 'dataAkun'
@@ -59,17 +57,6 @@ const JBProvider = ({ children }) => {
             const parsedData = JSON.parse(storedData);
             // memasukan data yang telah dirubah menjadi javascript kedalam state dataAkun
             setDataAkun(parsedData);
-        } else {
-            // Jika data tidak ada di localStorage,maka akan melakukan pemanggilan API
-            const apiCall = await FetchData();
-            // Mendapatkan data dari hasil pemanggilan API
-            // kemudian mengambil datanya
-            const { data } = apiCall;
-            // memasukkan data kedalam dataAkun
-            setDataAkun(data);
-            // Menyimpan data yang diperoleh dari API ke localStorage
-            // dengan merubah terlebih dahulu dari javascript biasa ke JSON
-            localStorage.setItem('dataAkun', JSON.stringify(data));
         }
     };
 
