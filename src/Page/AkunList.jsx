@@ -19,7 +19,7 @@ const loginOptions = ["Game", "Facebook", "Google", "iOS", "Tweeter", "VK", "Tik
  * @returns {JSX.Element} Komponen Daftar Akun Akun
  */
 const AkunList = () => {
-    const { dataAkun, handleEditFormContex, handleDeleteContext } = useJB(); 
+    const { dataAkun, handleEditFormContex, handleDeleteContext } = useJB();
 
     const [currentId, setCurrentId] = useState(null); // ID akun yang sedang aktif
     const [searchAkun, setSearchAkun] = useState(''); // state pencarian untuk filter daftar akun
@@ -35,7 +35,6 @@ const AkunList = () => {
     const [loginVia, setLoginVia] = useState(''); // State untuk metode login akun game yang sedang diedit
     const [dropdownJenisGameOpen, setDropdownJenisGameOpen] = useState(false); // status dropdown jenis game terbuka/tertutup
     const [viaLoginDropdownOpen, setViaLoginDropdownOpen] = useState(false); // Status dropdown metode login terbuka/tertutup
-    const [viaIsLoginDropdownOpenTerus, setViaIsLoginDropdownOpenTerus] = useState(false); // Status dropdown metode login selalu terbuka
 
     const [filteredAkun, setFilteredAkun] = useState([]); //  Array Data akun yang sudah difilter berdasarkan pencarian
     const [showPassword, setShowPassword] = useState(false); // Status tampilan password terlihat atau tidak(******)
@@ -48,28 +47,50 @@ const AkunList = () => {
      * useEffect untuk mengatur data akun yang difilter ketika dataAkun berubah
      */
     useEffect(() => {
-        setFilteredAkun(dataAkun);
-    }, [dataAkun]);
+        setFilteredAkun(dataAkun); // Mengatur state awal dengan data akun yang diterima
+    }, [dataAkun]); // Efek ini berjalan setiap kali dataAkun berubah
 
     /**
      * useEffect untuk memfilter data akun berdasarkan pencarian state searchAkun.
+     * useEffect ini menjalankan filter setiap kali searchAkun atau dataAkun berubah:
      */
     useEffect(() => {
+        // membuat object filterData
+        // dan membuat data.Akun.filter() untuk memfilter data akun berdasarkan kondisi tertentu.
         const filteredData = dataAkun.filter(n => {
             return (
+                // toLowerCase(): Mengubah teks menjadi huruf kecil.
+                // includes(searchAkun): Mengecek apakah teks includes dalam string yang dicari.
+                // jika includes maka akan difilter berdasarkan yang diinputkan 
                 n.nickname.toLowerCase().includes(searchAkun) ||
                 n.email.toLowerCase().includes(searchAkun) ||
                 n.password.toLowerCase().includes(searchAkun) ||
                 n.harga.toString().includes(searchAkun) ||
                 n.jenisGame.toLowerCase().includes(searchAkun) ||
-                ((n.loginVia)
-                    ? n.loginVia.some(via => via.toLowerCase().includes(searchAkun))
-                    :
-                    n.loginVia.toLowerCase().includes(searchAkun))
+                n.loginVia.some(via => via.toLowerCase().includes(searchAkun))
             );
         });
+        // setFilteredAkun(filteredData): Menetapkan data yang telah difilter ke dalam state filteredAkun.
         setFilteredAkun(filteredData);
-    }, [searchAkun, dataAkun]);
+    }, [searchAkun, dataAkun]); // menjalankan ulang useEffect setiap kali searchAkun atau dataAkun berubah
+
+    /**
+     * Handler untuk mengubah urutan data berdasarkan harga.
+     * 
+     * @param {event} event Event dari select untuk pengurutan
+     */
+    const handleSortChange = (event) => {
+        const sortOption = event.target.value;  // Mengambil value dari pilihan option  yang dipilih
+        let sortedData;
+        if (sortOption === 'highest') {
+            // jika sortOption value-nya adalah highest
+            sortedData = [...filteredAkun].sort((a, b) => b.harga - a.harga); // Akan mengurutkan berdasarkan harga tertinggi 
+        } else if (sortOption === 'lowest') {
+            // jika sortOption value-nya adalah lowest
+            sortedData = [...filteredAkun].sort((a, b) => a.harga - b.harga); // Akan Mengurutkan berdasarkan harga terendah
+        }
+        setFilteredAkun(sortedData); // Mengatur ulang state dengan data yang telah diurutkan
+    };
 
     /**
      * Handler untuk memperbarui nilai pencarian state searchAkun
@@ -77,7 +98,10 @@ const AkunList = () => {
      * @param {event} event event dari input pencarian 
      */
     const handleSearch = (event) => {
+        // event.target.value mengambil value dari input
+        // toLowerCase(): Mengubah nilai input menjadi huruf kecil untuk memudahkan pencarian tanpa memperhatikan huruf besar/kecil.
         const searchDataAkun = event.target.value.toLowerCase();
+        // Mengubah state searchAkun dengan value input yang telah diubah menjadi huruf kecil.
         setSearchAkun(searchDataAkun);
     };
 
@@ -92,7 +116,6 @@ const AkunList = () => {
         } else {
             setLoginVia([...loginVia, login]);
         }
-        setViaIsLoginDropdownOpenTerus(false);
     };
 
     /**
@@ -108,15 +131,12 @@ const AkunList = () => {
      * Handler untuk menyimpan perubahan pada form edit akun. 
      */
     const handleEditForm = async () => {
-        if (!nickname || !email || !password || !harga){
+        if (!nickname || !email || !password || !harga) {
             return alert('semua field harus diisi')
         } else if (!jenisGame || loginVia.length === 0) {
-             alert("pilih option pada dropdown!")
-             return
+            alert("pilih option pada dropdown!")
+            return
         }
-         
-
-        if (!editedAkun) return;
 
         const updatedAkun = {
             ...editedAkun,
@@ -128,38 +148,26 @@ const AkunList = () => {
             loginVia
         };
 
-        handleEditFormContex(updatedAkun);
-        setShowEditForm(false);
+        handleEditFormContex(updatedAkun); // Memperbarui data di context
+        setShowEditForm(false); // Menutup form edit
     };
 
     /**
-     * Handler untuk menghapus akun berdasarkan ID.
-     * 
-     * @param {number} id ID akn yang akan di hapus. 
-     */
-    const handleDelete = (id) => {
-        // Menampilkan alert konfirmasi sebelum menghapus
-        if (window.confirm("Apakah Anda yakin ingin menghapus akun ini?")) {
-            // memanggil fungsi handleDeleteContext untuk menghapus akun
-            handleDeleteContext(id);
-        }
-    }
-
-    /**
-     * Handler untuk memulai proses edit pada akun berdasarkan ID.
-     * 
-     * @param {number} id ID akun yang akan diedit.
-     */
+    * Handler untuk memulai proses edit pada akun berdasarkan ID.
+    * Function handleEdit digunakan untuk mengisi state dengan data akun yang akan diedit dan menampilkan form edit.
+    * 
+    * @param {number} id ID akun yang akan diedit.
+    */
     const handleEdit = (id) => {
         const akunToEdit = dataAkun.find(akun => akun.id === id);
-        setEditedAkun(akunToEdit);
-        setNickname(akunToEdit.nickname);
-        setEmail(akunToEdit.email);
-        setPassword(akunToEdit.password);
-        setHarga(akunToEdit.harga);
-        setJenisGame(akunToEdit.jenisGame);
-        setLoginVia(akunToEdit.loginVia);
-        setShowEditForm(true);
+        setEditedAkun(akunToEdit); // Menyimpan akun yang akan diedit dalam state
+        setNickname(akunToEdit.nickname); // Menyimpan nickname dalam state
+        setEmail(akunToEdit.email); // Menyimpan email dalam state
+        setPassword(akunToEdit.password); // Menyimpan password dalam state
+        setHarga(akunToEdit.harga); // Menyimpan harga dalam state
+        setJenisGame(akunToEdit.jenisGame); // Menyimpan jenisGame dalam state
+        setLoginVia(akunToEdit.loginVia); // Menyimpan loginVia dalam state
+        setShowEditForm(true); // Menampilkan form edit
     };
 
     /**
@@ -170,20 +178,17 @@ const AkunList = () => {
     };
 
     /**
-     * Handler untuk mengubah urutan data berdasarkan harga.
+     * Handler untuk menghapus akun berdasarkan ID.
      * 
-     * @param {event} event Event dari select untuk pengurutan
+     * @param {number} id ID akun yang akan di hapus. 
      */
-    const handleSortChange = (event) => {
-        const sortOption = event.target.value;
-        let sortedData;
-        if (sortOption === 'highest') {
-            sortedData = [...filteredAkun].sort((a, b) => b.harga - a.harga);
-        } else if (sortOption === 'lowest') {
-            sortedData = [...filteredAkun].sort((a, b) => a.harga - b.harga);
+    const handleDelete = (id) => {
+        // Menampilkan alert konfirmasi sebelum menghapus
+        if (window.confirm("Apakah Anda yakin ingin menghapus akun ini?")) {
+            // memanggil fungsi handleDeleteContext untuk menghapus akun
+            handleDeleteContext(id);
         }
-        setFilteredAkun(sortedData);
-    };
+    }
 
     /**
      * Menghitung indeks item terakhir yang ditampilkan dihalaman saat ini.
@@ -229,6 +234,7 @@ const AkunList = () => {
             <div className='flex flex-col mr-[50px] w-full gap-5 mt-[50px]'>
                 <div className='bg-[#ffffff] w-full p-4 border-gray-300 rounded shadow-lg z-10'>
                     <div className='flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 md:space-x-4'>
+                        {/* Form edit ditampilkan dengan nilai yang sudah diisi sebelumnya.Pengguna dapat mengubah nilai dan menyimpan perubahan. */}
                         {showEditForm && (
                             <div className="fixed inset-0 flex items-center justify-center bg-[#0000009f] z-50">
                                 <div className="bg-white p-6 rounded shadow-lg">
@@ -294,24 +300,43 @@ const AkunList = () => {
 
                                         <div className="relative">
                                             <label htmlFor="">Jenis Game</label>
-                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setDropdownJenisGameOpen(!dropdownJenisGameOpen)}>
+                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between"
+                                                //onClick untuk membuka dan menutup dropDown
+                                                onClick={() => setDropdownJenisGameOpen(!dropdownJenisGameOpen)}>
+                                                {/* jika true
+                                                menampilkan gambar, dan nama dari object array dataGambarGame.
+                                                menyamakan nama dari array dataGambarGame dengan nama dari option dropdown
+                                                jika sama maka image dan nama akan tampil
+                                                jika tidak dama maka akan undifined tetapi tidak menampilkan error */}
                                                 {jenisGame ? (
                                                     <>
                                                         <img className="h-[24px] w-auto rounded-sm mr-2" src={dataGambarGame.find(game => game.name === jenisGame)?.image} alt={jenisGame} />
+                                                        {/* menampilkan nama game yang dipilih dari option dropdown */}
                                                         {jenisGame}
                                                     </>
                                                 ) : (
+                                                    //jika false akan menampikan text Game
                                                     "Game"
                                                 )}
+
                                                 <span className="ml-2">{dropdownJenisGameOpen ?
+                                                    //jika false akan menampikan ▲
                                                     '▲' :
+                                                    //jika false akan menampikan ▼
                                                     '▼'}</span>
                                             </div>
+
+                                            
+                                            {/* jika dropdown true maka kode ini akan terbuka dan sebaliknya */}
                                             {dropdownJenisGameOpen && (
                                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10">
+                                                    {/* option dari dropdown. jika diklik akan mengambil option name sesuai yang dipilih */}
                                                     {dataGambarGame.map((game, index) => (
-                                                        <div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100" onClick={() => { setJenisGame(game.name); setDropdownJenisGameOpen(false); }}>
+                                                        <div key={index} className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+                                                            //menampilkan gambar game dan nama game dari object array dataGambarGame
+                                                            onClick={() => { setJenisGame(game.name); setDropdownJenisGameOpen(false); }}>
                                                             <img className="h-[24px] w-auto rounded-sm mr-2" src={game.image} alt={game.name} />
+                                                            {/* menangkap value nama */}
                                                             {game.name}
                                                         </div>
                                                     ))}
@@ -320,30 +345,41 @@ const AkunList = () => {
                                         </div>
                                         <div className="relative">
                                             <label htmlFor="">Via Login</label>
-                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between" onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
+                                            <div className="resize-none border-solid border-[1.5px] border-[#aeaeae] rounded w-full h-[40px] p-[10px] bg-white placeholder-gray-500 cursor-pointer flex items-center justify-between"
+                                                //onClick untuk membuka dan menutup dropDown
+                                                onClick={() => setViaLoginDropdownOpen(!viaLoginDropdownOpen)}>
+                                                {/* mengesting jumlah array lebih dari 0 maka akan dilakukan penambahan koma */}
                                                 {loginVia.length > 0 ?
+                                                    // penambahan koma pada setiap elemen yang digabungkan.
                                                     loginVia.join(', ')
                                                     :
+                                                    // jika lenght nya tidak lebih dari 0
+                                                    //maka akan muncul text login
                                                     "Login"}
-                                                <span className="ml-2">{viaIsLoginDropdownOpenTerus ?
+                                                <span className="ml-2">{viaLoginDropdownOpen ?
+                                                    //jika false akan menampikan ▲
                                                     '▲' :
+                                                    //jika false akan menampikan ▼
                                                     '▼'}</span>
                                             </div>
                                             {viaLoginDropdownOpen && (
                                                 <div className="absolute top-[45px] left-0 w-full bg-white border border-gray-300 rounded shadow-lg z-10 ">
+                                                    {/* memanggil Array LoginOptions lalu dimap dan mengambil value Option dan index */}
                                                     {loginOptions.map((option, index) => (
-                                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 ${loginVia.includes(option) ?
-                                                            'bg-[#2D92CF] text-white'
-                                                            :
-                                                            ''}`} onClick={() => handleLoginChange(option)} >
+                                                        <div key={index} className={`flex items-center p-2 cursor-pointer max-h-7 
+                                                            ${loginVia.includes(option) ? //memastikan nilai option ada di state loginVia
+                                                                'bg-[#2D92CF] text-white'  // jika ada(includes) maka bg-nya berwarna biru, dan text white
+                                                                :
+                                                                ''}`} // jika option tidak ada di state login Option maka akan mengemnalikan data kosomg
+                                                            // onClick untuk mengirim value option ke handleLoginChange
+                                                            onClick={() => handleLoginChange(option)} >
+                                                            {/* menangkap value option  */}
                                                             {option}
                                                         </div>
                                                     ))}
                                                 </div>
                                             )}
                                         </div>
-
-
                                         <button
                                             onClick={handleEditForm}
                                             className="bg-[#2D92CF] hover:bg-[#2D92CF] text-white px-4 py-2 rounded"
@@ -356,20 +392,23 @@ const AkunList = () => {
                         )}
 
                         <input
-                            type="search"
-                            value={searchAkun}
-                            onChange={handleSearch}
+                            type="search" //type search
+                            value={searchAkun} // menangkap value dan dimasukkan ke state searchAkun
+                            onChange={handleSearch} // menangani perubahan dengan memanggil function handleSearch
                             placeholder="Search"
                             className='w-full p-2 rounded border border-gray-300'
                         />
 
                         <select
-                            onChange={handleSortChange}
-                            defaultValue=""
+                            onChange={handleSortChange} // Mengaitkan function handleSortChange yang akan dipanggil setiap kali option dipilih dan mengambil value highest/lowest.
+                            defaultValue="" // Menentukan nilai default kosong untuk elemen select.
                             className='w-full md:w-auto p-2 rounded border border-gray-300'
                         >
+                            {/* Option default yang dinonaktifkan(desabled) dan digunakan sebagai placeholder. */}
                             <option value="" disabled>Sort by Harga</option>
+                            {/* Option untuk menyortir berdasarkan harga tertinggi.dengan mengambil value "highest" */}
                             <option value="highest">Harga tertinggi</option>
+                            {/* Option untuk menyortir berdasarkan harga tertinggi.dengan mengambil value "lowest" */}
                             <option value="lowest">Harga Terendah</option>
                         </select>
                     </div>
